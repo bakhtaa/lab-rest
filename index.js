@@ -53,3 +53,32 @@ id: this.lastID }
 });
 });
 });
+// Mettre à jour une personne
+app.put('/personnes/:id', (req, res) => {
+const id = req.params.id;
+const nom = req.body.nom;
+db.run(`UPDATE personnes SET nom = ? WHERE id = ?`, [nom, id], function(err) {
+if (err) {
+res.status(400).json({
+"error": err.message
+});
+return; }
+res.json({
+"message": "success"
+});
+});
+});
+// Supprimer une personne
+app.delete('/personnes/:id', (req, res) => {
+const id = req.params.id;
+db.run(`DELETE FROM personnes WHERE id = ?`, id, function(err) {
+if (err) {
+res.status(400).json({
+"error": err.message
+});
+return;
+}
+res.json({
+"message": "success" });
+});
+});
