@@ -1,0 +1,55 @@
+const express = require('express');
+const db = require('./database');
+const app = express();
+app.use(express.json());
+const PORT = 3000;
+
+app.listen(PORT, () => {console.log(`Server running on port ${PORT}`); });
+app.get('/', (req, res) => {
+res.json("Registre de personnes! Choisissez le bon routage!")
+})
+// Récupérer toutes les personnes
+app.get('/personnes', (req, res) => {
+db.all("SELECT * FROM personnes", [], (err, rows) => {
+if (err) {
+res.status(400).json({
+"error": err.message
+});
+return;
+}
+res.json({
+"message": "success",
+"data": rows
+});
+});
+});
+// Récupérer une personne par ID
+app.get('/personnes/:id', (req, res) => {
+const id = req.params.id;
+db.get("SELECT * FROM personnes WHERE id = ?", [id], (err, row) => {
+if (err) {
+res.status(400).json({
+"error": err.message
+});
+return; }
+res.json({
+"message": "success",
+"data": row });
+});
+});
+// Créer une nouvelle personne
+app.post('/personnes', (req, res) => {
+const nom = req.body.nom;
+db.run(`INSERT INTO personnes (nom) VALUES (?)`, [nom], function(err) {
+if (err) {
+res.status(400).json({
+"error": err.message
+});
+return; }
+res.json({
+"message": "success",
+"data": {
+id: this.lastID }
+});
+});
+});
