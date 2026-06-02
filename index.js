@@ -39,19 +39,32 @@ res.json({
 });
 // Créer une nouvelle personne
 app.post('/personnes', (req, res) => {
-const nom = req.body.nom;
-db.run(`INSERT INTO personnes (nom) VALUES (?)`, [nom], function(err) {
-if (err) {
-res.status(400).json({
-"error": err.message
-});
-return; }
-res.json({
-"message": "success",
-"data": {
-id: this.lastID }
-});
-});
+
+    const nom = req.body.nom;
+    const adresse = req.body.adresse;
+
+    db.run(
+        `INSERT INTO personnes (nom, adresse) VALUES (?, ?)`,
+        [nom, adresse],
+        function(err) {
+
+            if (err) {
+                res.status(400).json({
+                    error: err.message
+                });
+                return;
+            }
+
+            res.json({
+                message: "success",
+                data: {
+                    id: this.lastID,
+                    nom,
+                    adresse
+                }
+            });
+        }
+    );
 });
 // Mettre à jour une personne
 app.put('/personnes/:id', (req, res) => {
