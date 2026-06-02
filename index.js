@@ -70,7 +70,8 @@ app.post('/personnes', (req, res) => {
 app.put('/personnes/:id', (req, res) => {
 const id = req.params.id;
 const nom = req.body.nom;
-db.run(`UPDATE personnes SET nom = ? WHERE id = ?`, [nom, id], function(err) {
+const adresse =req.body.adresse;
+db.run(`UPDATE personnes SET nom = ? , adresse = ? WHERE id = ?`, [nom,adresse,id], function(err) {
 if (err) {
 res.status(400).json({
 "error": err.message
