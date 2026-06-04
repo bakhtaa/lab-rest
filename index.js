@@ -96,3 +96,22 @@ res.json({
 "message": "success" });
 });
 });
+
+
+
+const session = require('express-session');
+const Keycloak = require('keycloak-connect');
+const memoryStore = new session.MemoryStore();
+app.use(session({
+secret: 'api-secret',
+resave: false,
+saveUninitialized: true,
+store: memoryStore
+}));
+// Configuration de Keycloak
+const keycloak = new Keycloak({ store: memoryStore }, './keycloak-config.json');
+app.use(keycloak.middleware());
+// Exemple : Protéger une route avec Keycloak
+app.get('/secure', keycloak.protect(), (req, res) => {
+res.json({ message: 'Authenticated Successfully!' });
+});
