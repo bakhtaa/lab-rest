@@ -5,11 +5,32 @@ app.use(express.json());
 const PORT = 3000;
 
 app.listen(PORT, () => {console.log(`Server running on port ${PORT}`); });
-app.get('/', (req, res) => {
+
+const session = require('express-session');
+const Keycloak = require('keycloak-connect');
+const memoryStore = new session.MemoryStore();
+app.use(session({
+secret: 'api-secret',
+resave: false,
+saveUninitialized: true,
+store: memoryStore
+}));
+// Configuration de Keycloak
+const keycloak = new Keycloak({ store: memoryStore }, './keycloak-config.json');
+app.use(keycloak.middleware());
+// Exemple : Protéger une route avec Keycloak
+app.get('/secure', keycloak.protect(), (req, res) => {
+res.json({ message: 'Authenticated Successfully!' });
+});
+
+
+app.get('/',keycloak.protect(), (req, res) => {
 res.json("Registre de personnes! Choisissez le bon routage!")
 })
+
+
 // Récupérer toutes les personnes
-app.get('/personnes', (req, res) => {
+app.get('/personnes', keycloak.protect(), (req, res) => {
 db.all("SELECT * FROM personnes", [], (err, rows) => {
 if (err) {
 res.status(400).json({
@@ -24,7 +45,7 @@ res.json({
 });
 });
 // Récupérer une personne par ID
-app.get('/personnes/:id', (req, res) => {
+app.get('/personnes/:id', keycloak.protect(), (req, res) => {
 const id = req.params.id;
 db.get("SELECT * FROM personnes WHERE id = ?", [id], (err, row) => {
 if (err) {
@@ -38,7 +59,7 @@ res.json({
 });
 });
 // Créer une nouvelle personne
-app.post('/personnes', (req, res) => {
+app.post('/personnes',  keycloak.protect(),(req, res) => {
 
     const nom = req.body.nom;
     const adresse = req.body.adresse;
@@ -67,7 +88,7 @@ app.post('/personnes', (req, res) => {
     );
 });
 // Mettre à jour une personne
-app.put('/personnes/:id', (req, res) => {
+app.put('/personnes/:id', keycloak.protect(), (req, res) => {
 const id = req.params.id;
 const nom = req.body.nom;
 const adresse =req.body.adresse;
@@ -83,7 +104,7 @@ res.json({
 });
 });
 // Supprimer une personne
-app.delete('/personnes/:id', (req, res) => {
+app.delete('/personnes/:id', keycloak.protect(), (req, res) => {
 const id = req.params.id;
 db.run(`DELETE FROM personnes WHERE id = ?`, id, function(err) {
 if (err) {
@@ -99,19 +120,3 @@ res.json({
 
 
 
-const session = require('express-session');
-const Keycloak = require('keycloak-connect');
-const memoryStore = new session.MemoryStore();
-app.use(session({
-secret: 'api-secret',
-resave: false,
-saveUninitialized: true,
-store: memoryStore
-}));
-// Configuration de Keycloak
-const keycloak = new Keycloak({ store: memoryStore }, './keycloak-config.json');
-app.use(keycloak.middleware());
-// Exemple : Protéger une route avec Keycloak
-app.get('/secure', keycloak.protect(), (req, res) => {
-res.json({ message: 'Authenticated Successfully!' });
-});
