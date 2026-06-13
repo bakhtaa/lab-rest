@@ -1,8 +1,10 @@
 {
-  "realm": "master",
+  "realm": "mamlaka",
   "auth-server-url": "http://localhost:8080/",
   "ssl-required": "external",
   "resource": "api-users",
+    "bearer-only": true,
+
   "verify-token-audience": false,
   "credentials": {
     "secret": "lmMqDHxDIwXzO6GITSQHs61z47w8r7JQ"

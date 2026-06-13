@@ -60,7 +60,10 @@ app.get('/secure',keycloak.protect(),  (req, res) => {
    ========================= */
 
 // GET ALL
-app.get('/personnes', keycloak.protect(), (req, res) => {
+app.get('/personnes', (req, res, next) => {
+    console.log("Authorization:", req.headers.authorization);
+    next();
+}, keycloak.protect(), (req, res) => {
     db.all("SELECT * FROM personnes", [], (err, rows) => {
         if (err) {
             return res.status(400).json({ error: err.message });
