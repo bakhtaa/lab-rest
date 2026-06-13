@@ -1,13 +1,15 @@
 const express = require('express');
 const db = require('./database');
+const session = require('express-session');
+const Keycloak = require('keycloak-connect');
 const app = express();
 app.use(express.json());
 const PORT = 3000;
 
 app.listen(PORT, () => {console.log(`Server running on port ${PORT}`); });
 
-const session = require('express-session');
-const Keycloak = require('keycloak-connect');
+
+
 const memoryStore = new session.MemoryStore();
 app.use(session({
 secret: 'api-secret',
@@ -15,6 +17,14 @@ resave: false,
 saveUninitialized: true,
 store: memoryStore
 }));
+
+
+const swaggerUi = require("swagger-ui-express");
+const YAML = require("yamljs");
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(YAML.load("./openapi.yaml")));
+
+
 // Configuration de Keycloak
 const keycloak = new Keycloak({ store: memoryStore }, './keycloak-config.json');
 app.use(keycloak.middleware());
