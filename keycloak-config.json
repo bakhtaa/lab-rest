@@ -1,5 +1,5 @@
 {
-  "realm": "api-realm",
+  "realm": "master",
   "auth-server-url": "http://localhost:8080/",
   "ssl-required": "external",
   "resource": "api-users",
