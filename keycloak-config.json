@@ -2,7 +2,7 @@
   "realm": "api-realm",
   "auth-server-url": "http://localhost:8080/",
   "ssl-required": "external",
-  "resource": "api-users",
+  "resource": "api-personne",
     "bearer-only": true,
 
   "verify-token-audience": false,
